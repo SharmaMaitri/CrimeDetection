@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+
+<style>
+    #criminal {
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    #criminal td, #criminal th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    
+    #criminal tr:nth-child(even){background-color: #f2f2f2;}
+    
+    #criminal tr:hover {background-color: rgb(242, 206, 246);}
+    
+    #criminal th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #341a2e;
+      color: white;
+    }
+    </style>
+    
+<h2>Search the Criminal</h2>
+
+<form class="example" method="post" action="{{ url_for('search') }}" 
+         style="margin:auto;max-width:600px">
+            <input type="text" placeholder="Search Info" name="username" required>
+            <input type="submit" value="Search by Name" name="name">
+            <input type="submit" value="Search by Area" name="area">
+            <input type="submit" value="Search by Crime" name="crime">
+            
+        </form>
+        <p></p>
+        
+        <center>
+            <table id="criminal" >
+                <tr>{% for header in heading %}
+                    <th>{{header}}</th>
+                    {% endfor %}
+                </tr>
+
+        </tr>
+            
+        {% for item in data %}
+        <tr>
+          <td>{{item[0]}}</td>
+            <td> {{item[1]}}</td>
+            <td> {{item[2]}} </td> 
+            <td><a href="/pythonlogin/detail/{{item[0]}}" >detail</a></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </center>
+
+  
+      <center>
+        <table id="criminal" >
+            <tr>{% for headers in headings %}
+                <th>{{headers}}</th>
+                {% endfor %}
+            </tr>
+
+    </tr>
+        
+    {% for item in detail %}
+    <tr>
+      <td>{{item[0]}}</td>
+        <td> {{item[1]}}</td>
+        <td> {{item[2]}} </td>
+        <td> {{item[3]}}</td>
+        <td> {{item[4]}}</td>
+        <td> {{item[5]}}</td>
+        <td> {{item[6]}}</td>
+        <td> {{item[7]}}</td>
+        <td> {{item[8]}}</td>
+        <td> {{item[9]}}</td>
+        <td> {{item[10]}}</td>
+        <td> {{item[11]}}</td>
+        <td> {{item[12]}}</td>
+        <td> {{item[13]}}</td>
+        <td> {{item[14]}}</td>
+        <td> {{item[15]}}</td>
+        <td> {{item[16]}}</td>
+        <td> {{item[17]}}</td>
+        <td> {{item[18]}}</td>
+        <td> {{item[19]}}</td>          
+      </tr>
+    {% endfor %}
+    </table>
+      
+      </center>
+      <div class="msg">{{ msg }}{{ username }}</div>
+{% endblock %}
