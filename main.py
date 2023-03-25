@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-
 import re
 
 app = Flask(__name__)
@@ -123,21 +122,26 @@ def search():
         if request.method == "POST":
             username = request.form['username']
             cursor = mysql.connection.cursor()
-            heading=("Criminal id","UserName","Email")
+            heading=["Criminal id","UserName","Contect Number"]
             if request.form.get('name'):
-                cursor.execute("SELECT cid ,firstname,phone FROM pythonlogin.criminal_details where firstname LIKE %s ", (username+"%",))
+                heading.append("LastName")
+                cursor.execute("SELECT cid ,firstname,lastname,phone FROM pythonlogin.criminal_details where firstname LIKE %s ", (username+"%",))
                 data = cursor.fetchall()
             if request.form.get('area'):
-                cursor.execute("SELECT cid ,firstname,phone FROM pythonlogin.criminal_details where city LIKE %s ", (username+"%",))
+                heading.append("City")
+                cursor.execute("SELECT cid ,firstname,phone,city FROM pythonlogin.criminal_details where city LIKE %s ", (username+"%",))
                 data = cursor.fetchall()
            
             if request.form.get('crime'):
-                cursor.execute("SELECT cid ,firstname,phone FROM pythonlogin.criminal_details where company LIKE %s ", (username+"%",))
+                heading.append("CrimeType")
+                cursor.execute("SELECT cid ,firstname,phone,CrimeType FROM pythonlogin.criminal_details where CrimeType LIKE %s ", (username+"%",))
                 data = cursor.fetchall()
             
         # all in the search box will return all the tuples
-            if username == 'all': 
-                cursor.execute("SELECT cid ,firstname,phone FROM pythonlogin.criminal_details")
+            if username == 'all':
+                heading.append("city")
+                heading.append("CrimeType") 
+                cursor.execute("SELECT cid ,firstname,phone,city,CrimeType FROM pythonlogin.criminal_details")
                 data = cursor.fetchall() 
             elif len(data) == 0:
                 msg='No such data Found with User Name '    
@@ -148,15 +152,64 @@ def search():
     return redirect(url_for('login'))
 
 @app.route('/pythonlogin/detail/<string:id_data>', methods = ['GET','POST'])
-def update(id_data):
+def details(id_data):
     if 'loggedin' in session:
             flash("Record view Successfully")
             cur =mysql.connection.cursor()
-            cur.execute("select cid,firstname,lastname,address,city,state,country,pincode,ssn_number,countrycode,phone,dob,age,company,occupation,height,weight,bloodtype,fav_color FROM criminal_details WHERE cid=%s", (id_data,))
+            cur.execute("select cid,firstname,lastname,address,city,state,country,pincode,ssn_number,countrycode,phone,dob,age,company,occupation,height,weight,bloodtype,fav_color,vehicle,CrimeType FROM criminal_details WHERE cid=%s", (id_data,))
             detail = cur.fetchall()
             #print(detail)
             headings=("Criminal id","First Name","Last Name","Address","City","State","Country","Pincode","SSN NO.","Country Code","Phone","DOB","Age","Company","Occupation","Height","Weight","Blood_Type","Favorite Color" )
             
-            return render_template('search.html',headings=headings,detail=detail)
+            return render_template('details.html',headings=headings,detail=detail)
         
     return redirect(url_for('login'))
+
+@app.route('/pythonlogin/addCriminal', methods=['GET','POST'])
+def addCriminal():
+    # Output message if something goes wrong...
+    msg = ''
+    if request.method == 'POST':
+        # Create variables for easy access
+        Gender= request.form['gender']
+        NameSet= request.form['NameSet']
+        GivenName= request.form['UserName']
+        Surname= request.form['Surname']
+        StreetAddress= request.form['StreetAddress']
+        City= request.form['City']
+        StateFull= request.form['State']
+        ZipCode= request.form['ZipCode']
+        EmailAddress= request.form['EmailAddress']#area
+        CountryFull= request.form['CountryFull']
+        TelephoneNumber= request.form['TelephoneNumber']
+        Birthday= request.form['Birthday']
+        Age= request.form['Age']
+        Occupation= request.form['Occupation']
+        Company= request.form['Company']
+        Vehicle= request.form['CompanyVehicle']
+        BloodType= request.form['BloodType']
+        Kilograms= request.form['Kilograms']
+        FeetInches= request.form['FeetInches']
+        CrimeType= request.form['CrimeType']
+        Area = request.form['Area']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', EmailAddress):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z]+', GivenName,Surname,NameSet,City):
+            msg = 'NameSet,Username,Surname,City must contain only characters !'
+        elif not re.match(r'[0-9]+',TelephoneNumber):
+            msg = 'TelephoneNumber must contain only number !'
+        elif not re.match(r'[0-9]+',Age):
+            msg = 'Age must contain only number !'
+        else:
+            cursor.execute('INSERT INTO criminal VALUES (NULL,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (Gender,NameSet,GivenName,Surname,StreetAddress,City,StateFull,ZipCode,CountryFull,EmailAddress,TelephoneNumber,Birthday,Age,Occupation,Company,Vehicle,BloodType,Kilograms,FeetInches,CrimeType,Area,))
+            mysql.connection.commit()
+            msg = 'Criminal added successfully !!'
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+       
+    return render_template('addCriminal.html', msg=msg)
+
+if __name__ == '__main__':
+    app.run(host = 'localhost', debug = True, port = '5000')
