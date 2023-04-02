@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %}Add Criminal{% endblock %}
+
+{% block content %}
+    <!---<title> Responsive Registration Form | CodingLab </title>--->
+    <link rel="stylesheet" href="style.css">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">Search Your Location</div>
+    <div class="content">
+      <div class="msg"><h3><center><b><font color="red">{{ msg }}</font></b></center></h3></div>
+      <form action="{{ url_for('googlemap') }}" method="post" autocomplete="off">
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Start Point</span>
+            <input type="text" placeholder="Enter your Start Point" name="startPoint" required>
+          </div>
+          <div class="input-box">
+            <span class="details">End Point</span>
+            <input type="text" placeholder="Enter your End Point" name="endPoint" required>
+          </div>
+          </div>
+          <div class="button">
+            <input type="submit" value="Search">
+          </div>
+      </form>
+    </div>
+  </div>
+
+  <tr>{% for header in data %}
+    <div class="msg"><h3><center><b><font color="red">Total time to reach the destination :-  <th>{{header}}</th></font></b></center></h3></div>
+    {% endfor %}
+</tr>
+
+{% endblock %}

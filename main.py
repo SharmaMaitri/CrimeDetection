@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
+from selenium import webdriver 
+from time import sleep 
 
 app = Flask(__name__)
 
@@ -141,7 +143,7 @@ def search():
             if username == 'all':
                 heading.append("city")
                 heading.append("CrimeType") 
-                cursor.execute("SELECT cid ,firstname,phone,city,CrimeType FROM pythonlogin.criminal_details")
+                cursor.execute("SELECT cid ,firstname,phone,lastname,city,CrimeType FROM pythonlogin.criminal_details")
                 data = cursor.fetchall() 
             elif len(data) == 0:
                 msg='No such data Found with User Name '    
@@ -167,49 +169,108 @@ def details(id_data):
 
 @app.route('/pythonlogin/addCriminal', methods=['GET','POST'])
 def addCriminal():
-    # Output message if something goes wrong...
-    msg = ''
-    if request.method == 'POST':
-        # Create variables for easy access
-        Gender= request.form['gender']
-        NameSet= request.form['NameSet']
-        GivenName= request.form['UserName']
-        Surname= request.form['Surname']
-        StreetAddress= request.form['StreetAddress']
-        City= request.form['City']
-        StateFull= request.form['State']
-        ZipCode= request.form['ZipCode']
-        EmailAddress= request.form['EmailAddress']#area
-        CountryFull= request.form['CountryFull']
-        TelephoneNumber= request.form['TelephoneNumber']
-        Birthday= request.form['Birthday']
-        Age= request.form['Age']
-        Occupation= request.form['Occupation']
-        Company= request.form['Company']
-        Vehicle= request.form['CompanyVehicle']
-        BloodType= request.form['BloodType']
-        Kilograms= request.form['Kilograms']
-        FeetInches= request.form['FeetInches']
-        CrimeType= request.form['CrimeType']
-        Area = request.form['Area']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        if not re.match(r'[^@]+@[^@]+\.[^@]+', EmailAddress):
-            msg = 'Invalid email address!'
-        elif not re.match(r'[A-Za-z]+', GivenName,Surname,NameSet,City):
-            msg = 'NameSet,Username,Surname,City must contain only characters !'
-        elif not re.match(r'[0-9]+',TelephoneNumber):
-            msg = 'TelephoneNumber must contain only number !'
-        elif not re.match(r'[0-9]+',Age):
-            msg = 'Age must contain only number !'
-        else:
-            cursor.execute('INSERT INTO criminal VALUES (NULL,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (Gender,NameSet,GivenName,Surname,StreetAddress,City,StateFull,ZipCode,CountryFull,EmailAddress,TelephoneNumber,Birthday,Age,Occupation,Company,Vehicle,BloodType,Kilograms,FeetInches,CrimeType,Area,))
-            mysql.connection.commit()
-            msg = 'Criminal added successfully !!'
-    elif request.method == 'POST':
-        # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
+    if 'loggedin' in session:
+        msg = ''
+        if request.method == 'POST':
+            # Create variables for easy access
+            Gender= request.form['gender']
+            NameSet= request.form['NameSet']
+            GivenName= request.form['UserName']
+            Surname= request.form['Surname']
+            StreetAddress= request.form['StreetAddress']
+            City= request.form['City']
+            StateFull= request.form['State']
+            ZipCode= request.form['ZipCode']
+            EmailAddress= request.form['EmailAddress']#area
+            CountryFull= request.form['CountryFull']
+            TelephoneNumber= request.form['TelephoneNumber']
+            Birthday= request.form['Birthday']
+            Age= request.form['Age']
+            Occupation= request.form['Occupation']
+            Company= request.form['Company']
+            Vehicle= request.form['CompanyVehicle']
+            BloodType= request.form['BloodType']
+            Kilograms= request.form['Kilograms']
+            FeetInches= request.form['FeetInches']
+            CrimeType= request.form['CrimeType']
+            Area = request.form['Area']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            if not re.match(r'[^@]+@[^@]+\.[^@]+', EmailAddress):
+                msg = 'Invalid email address!'
+            elif not re.match(r'[A-Za-z]+', GivenName):
+                msg = 'NameSet,Username,Surname,City must contain only characters !'
+            elif not re.match(r'[0-9]+',TelephoneNumber):
+                msg = 'TelephoneNumber must contain only number !'
+            elif not re.match(r'[0-9]+',Age):
+                msg = 'Age must contain only number !'
+            
+            else:
+                cursor.execute('INSERT INTO criminal VALUES (NULL,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (Gender,NameSet,GivenName,Surname,StreetAddress,City,StateFull,ZipCode,CountryFull,EmailAddress,TelephoneNumber,Birthday,Age,Occupation,Company,Vehicle,BloodType,Kilograms,FeetInches,CrimeType,Area,))
+                mysql.connection.commit()
+                msg = 'Criminal added successfully !!'
+        elif request.method == 'POST':
+            # Form is empty... (no POST data)
+            msg = 'Please fill out the form!'
        
     return render_template('addCriminal.html', msg=msg)
 
+@app.route('/pythonlogin/googlemap', methods=['GET','POST'])
+def googlemap():
+    msg = ''
+    data=[]
+    if 'loggedin' in session:
+        if request.method == 'POST':
+            # Create variables for easy access
+            startPoint = request.form['startPoint']
+            endPoint = request.form['endPoint']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            driver = webdriver.Chrome()
+            driver.get("https://www.google.co.in/maps/@10.8091781,78.2885026,7z") 
+            sleep(2) 
+            def searchplace():
+                Place=driver.find_element_by_class_name("tactile-searchbox-input")
+                Place.send_keys(startPoint)
+                Submit=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[3]/div[1]/div[1]/div[1]/div[2]/div[1]/button")
+                Submit.click()
+                print(startPoint)
+            searchplace()
+            def directions():
+                sleep(5)
+                directions=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[4]/div[1]/button")
+                directions.click()
+            directions()
+            def find():
+                sleep(6)
+                find=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[3]/div[1]/div[2]/div/div[3]/div[1]/div[1]/div[2]/div[1]/div/input")
+                find.send_keys(endPoint)
+                sleep(2)
+                search=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[3]/div[1]/div[2]/div/div[3]/div[1]/div[1]/div[2]/button[1]")
+                search.click()
+
+            find()
+            def kilometers():
+                sleep(2)
+                Totalkilometers=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[3]/div[1]/div[2]/div/div[2]/div/div/div/div[2]/button/div[1]")
+                #/html/body/div[3]/div[9]/div[3]/div[1]/div[2]/div/div[2]/div/div/div/div[2]/button/div[1]")
+                #/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div")
+                print("Total Hours:",Totalkilometers.text)
+                data.append(Totalkilometers.text)
+                # sleep(2)
+                # Train=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/span[1]")
+                # print("Train Travel:",Train.text)
+                # data.append(Train.text)
+                # sleep(2)
+                # Train=driver.find_element_by_xpath("/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[4]/div[3]/div[1]/div[2]/div[1]/div")
+                # print("Train Travel:",Train.text)
+                # data.append(Train.text)
+                # sleep(2)
+            kilometers()
+        
+            
+        elif request.method == 'POST':
+            # Form is empty... (no POST data)
+            msg = 'Please fill out the form!'
+
+    return render_template('googlemap.html',data=data,msg=msg)
 if __name__ == '__main__':
     app.run(host = 'localhost', debug = True, port = '5000')

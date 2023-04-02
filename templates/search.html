@@ -27,8 +27,22 @@
       background-color: #341a2e;
       color: white;
     }
+    #criminal a:link, #criminal a:visited {
+        background-color:  rgb(46, 3, 40);
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    #criminal a:hover,#criminal a:active {
+        background-color: rgb(126, 26, 118);
+    }
     </style>
-    
+
+<div id="criminal">
+    <a href="{{ url_for('googlemap') }}" class="active">search Location</a> 
 <h2>Search the Criminal</h2>
 
 <form class="example" method="post" action="{{ url_for('search') }}" 
@@ -39,7 +53,7 @@
             <input type="submit" value="Search by Crime" name="crime">
             
         </form>
-        <p></p>
+        </div>
         
         <center>
             <table id="criminal" >
@@ -56,7 +70,10 @@
             <td> {{item[1]}}</td>
             <td> {{item[2]}} </td> 
             <td> {{item[3]}} </td> 
-            <td> {{item[4]}} </td> 
+            {% if item[4] != null: %}
+                <td> {{item[4]}} </td> 
+                <td> {{item[5]}} </td> 
+	        {% endif %}
             <td><a href="/pythonlogin/detail/{{item[0]}}" >detail</a></td>
           </tr>
         {% endfor %}

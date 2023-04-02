@@ -280,3 +280,17 @@
       }
     }
     
+    #criminal a:link, #criminal a:visited {
+      background-color:  rgb(46, 3, 40);
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+  }
+
+  #criminal a:hover,#criminal a:active {
+      background-color: rgb(126, 26, 118);
+  }
+    
+    
