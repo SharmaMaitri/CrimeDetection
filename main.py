@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from flask_mysqldb import MySQL
-import MySQLdb.cursors
+from flask_mysqldb import pymysql
+import pymysql.cursors
 import re
 from selenium import webdriver 
 from time import sleep 
@@ -16,8 +16,8 @@ app.config['MYSQL_USER'] = 'admin'
 app.config['MYSQL_PASSWORD'] = 'oyTAry1t9ZWsMf9wbNrk'
 app.config['MYSQL_DB'] = 'ibm-project'
 
-# Intialize MySQL
-mysql = MySQL(app)
+# Intialize pymysql
+pymysql = pymysql(app)
 @app.route('/pythonlogin/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
@@ -27,9 +27,9 @@ def login():
         # Create variables for easy access
         username = request.form['username']
         password = request.form['password']
-        # Check if account exists using MySQL
-        #cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)     
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # Check if account exists using pymysql
+        #cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)     
+        cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
        
         cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password,))
         # Fetch one record and return result
@@ -69,8 +69,8 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-                # Check if account exists using MySQL
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                # Check if account exists using pymysql
+        cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
         account = cursor.fetchone()
         # If account exists show error and validation checks
@@ -85,7 +85,7 @@ def register():
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email,))
-            mysql.connection.commit()
+            pymysql.connection.commit()
             msg = 'You have successfully registered! Do Login...'
     elif request.method == 'POST':
         # Form is empty... (no POST data)
@@ -109,7 +109,7 @@ def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
         # We need all the account info for the user so we can display it on the profile page
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
         account = cursor.fetchone()
         # Show the profile page with account info
@@ -123,7 +123,7 @@ def search():
     if 'loggedin' in session:
         if request.method == "POST":
             username = request.form['username']
-            cursor = mysql.connection.cursor()
+            cursor = pymysql.connection.cursor()
             heading=["Criminal id","UserName","Contect Number"]
             if request.form.get('name'):
                 heading.append("LastName")
@@ -157,7 +157,7 @@ def search():
 def details(id_data):
     if 'loggedin' in session:
             flash("Record view Successfully")
-            cur =mysql.connection.cursor()
+            cur =pymysql.connection.cursor()
             cur.execute("select cid,firstname,lastname,address,city,state,country,pincode,ssn_number,countrycode,phone,dob,age,company,occupation,height,weight,bloodtype,fav_color,vehicle,CrimeType FROM criminal_details WHERE cid=%s", (id_data,))
             detail = cur.fetchall()
             #print(detail)
@@ -194,7 +194,7 @@ def addCriminal():
             FeetInches= request.form['FeetInches']
             CrimeType= request.form['CrimeType']
             Area = request.form['Area']
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
             if not re.match(r'[^@]+@[^@]+\.[^@]+', EmailAddress):
                 msg = 'Invalid email address!'
             elif not re.match(r'[A-Za-z]+', GivenName):
@@ -206,7 +206,7 @@ def addCriminal():
             
             else:
                 cursor.execute('INSERT INTO criminal VALUES (NULL,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (Gender,NameSet,GivenName,Surname,StreetAddress,City,StateFull,ZipCode,CountryFull,EmailAddress,TelephoneNumber,Birthday,Age,Occupation,Company,Vehicle,BloodType,Kilograms,FeetInches,CrimeType,Area,))
-                mysql.connection.commit()
+                pymysql.connection.commit()
                 msg = 'Criminal added successfully !!'
         elif request.method == 'POST':
             # Form is empty... (no POST data)
@@ -223,7 +223,7 @@ def googlemap():
             # Create variables for easy access
             startPoint = request.form['startPoint']
             endPoint = request.form['endPoint']
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
             driver = webdriver.Chrome()
             driver.get("https://www.google.co.in/maps/@10.8091781,78.2885026,7z") 
             sleep(2) 
