@@ -53,7 +53,7 @@ def googlemap():
             # Create variables for easy access
             startPoint = request.form['startPoint']
             endPoint = request.form['endPoint']
-            cursor = pymysql.connection.cursor(pymysql.cursors.DictCursor)
+            cursor = pymysql.connection.cursor(pymysqldb.cursors.DictCursor)
             if not re.match(r'[0-9]*[A-Za-z]+[0-9]*', startPoint,endPoint):
                 msg = 'enter valid StartPoint,end point!'
             def searchplace():
