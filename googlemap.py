@@ -42,7 +42,12 @@ def kilometers():
                sleep(7)
 
 kilometers()
-'''CriminalDatabase.csv'''
+'''
+
+app.config['MYSQL_HOST'] = 'ibm-project.cnr3cxrsxzux.us-east-1.rds.amazonaws.com'
+app.config['MYSQL_USER'] = 'admin'
+app.config['MYSQL_PASSWORD'] = 'oyTAry1t9ZWsMf9wbNrk'
+app.config['MYSQL_DB'] = 'pythonlogin'''
 '''
 @app.route('/pythonlogin/googlemap', methods=['GET','POST'])
 def googlemap():

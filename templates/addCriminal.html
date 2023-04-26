@@ -5,14 +5,16 @@
 {% block content %}
     <!---<title> Responsive Registration Form | CodingLab </title>
     <link rel="stylesheet" href="style.css">--->
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+     <script src="{{ url_for('static', filename='script.js') }}"></script>
    </head>
 <body>
   <div class="container">
     <div class="title">Add Criminal</div>
+    
     <div class="content">
       <div class="msg"><h3><center><b><font color="red">{{ msg }}</font></b></center></h3></div>
-      <form action="{{ url_for('addCriminal') }}" method="post" autocomplete="off">
+      <form action="{{ url_for('addCriminal') }}" method="post" autocomplete="off" id="addCriminal_form" >
         <div class="user-details">
             <div class="gender-details">
                 <span class="gender-title">Gender</span>
@@ -32,97 +34,110 @@
               </div>
           <div class="input-box">
             <span class="details">Name Set</span>
-            <input type="text" placeholder="Enter your name set" name="NameSet" required>
+            <input type="text" placeholder="Enter your name set" name="NameSet" id="NameSet" required>
           </div>
           <div class="input-box">
             <span class="details">User Name</span>
-            <input type="text" placeholder="Enter your username" name="UserName" required>
+            <input type="text" placeholder="Enter your username" name="UserName" id="UserName" required>
           </div>
           <div class="input-box">
             <span class="details">Surname</span>
-            <input type="text" placeholder="Enter your Surname" name="Surname" required>
+            <input type="text" placeholder="Enter your Surname" name="Surname" id="Surname" required>
           </div>
           <div class="input-box">
             <span class="details">Street Address</span>
-            <input type="text" placeholder="Enter your Street Address"name="StreetAddress" required>
+            <input type="text" placeholder="Enter your Street Address"name="StreetAddress" id="StreetAddress" required>
           </div>
           <div class="input-box">
             <span class="details">City</span>
-            <input type="text" placeholder="Enter your City" name="City"required>
+            <input type="text" placeholder="Enter your City" name="City" id="City" required>
           </div>
           <div class="input-box">
             <span class="details">State</span>
-            <input type="text" placeholder="Enter your StateFull" name="State" required>
+            <input type="text" placeholder="Enter your StateFull" name="State" id="State" required>
           </div>
           <div class="input-box">
             <span class="details">ZipCode</span>
-            <input type="text" placeholder="Enter your ZipCode" name="ZipCode" required>
+            <input type="text" placeholder="Enter your ZipCode" name="ZipCode" id="ZipCode" required>
           </div>
           <div class="input-box">
             <span class="details">EmailAddress</span>
-            <input type="text" placeholder="Enter your EmailAddress" name="EmailAddress" required>
+            <input type="text" placeholder="Enter your EmailAddress" name="EmailAddress" id="EmailAddress" pattern="[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}" required>
           </div>
           
           <div class="input-box">
             <span class="details">Area</span>
-            <input type="text" placeholder="Enter your Area" name="Area" required>
+            <input type="text" placeholder="Enter your Area" name="Area" id="Area" required>
           </div>
           <div class="input-box">
             <span class="details">CountryFull</span>
-            <input type="text" placeholder="Enter your CountryFull" name="CountryFull" required>
+            <input type="text" placeholder="Enter your CountryFull" name="CountryFull" id="CountryFull" required>
           </div>
           <div class="input-box">
             <span class="details">TelephoneNumber</span>
-            <input type="text" placeholder="Enter your TelephoneNumber" name="TelephoneNumber" required>
+            <input type="text" placeholder="Enter your TelephoneNumber" name="TelephoneNumber" id="TelephoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
           </div>
           <div class="input-box">
             <span class="details">Birthday</span>
-            <input type="text" placeholder="Enter your Birthday" name="Birthday" required>
+            <input type="text" placeholder="Enter your Birthday DD MMMM YYYY" name="Birthday" id="Birthday" data-date="" data-date-format="DD MMMM YYYY" required onchange="calculateAge()">
           </div>
           <div class="input-box">
             <span class="details">Age</span>
-            <input type="text" placeholder="Enter your Age" name="Age" required>
+            <input type="text" placeholder="Enter your Age" name="Age" id="Age" required readonly>
           </div>
           <div class="input-box">
             <span class="details">Occupation</span>
-            <input type="text" placeholder="Enter your Occupation" name="Occupation" required>
+            <input type="text" placeholder="Enter your Occupation" name="Occupation" id="Occupation" required>
           </div>
           
           <div class="input-box">
             <span class="details">Company</span>
-            <input type="text" placeholder="Enter your Company" name="Company" required>
+            <input type="text" placeholder="Enter your Company" name="Company" id="Company" required>
           </div>
           <div class="input-box">
             <span class="details">Company Vehicle</span>
-            <input type="text" placeholder="Enter your CompanyVehicle" name="CompanyVehicle" required>
+            <input type="text" placeholder="Enter your CompanyVehicle" name="CompanyVehicle" id="CompanyVehicle" required>
           </div>
           <div class="input-box">
             <span class="details">Blood Group</span>
-            <input type="text" placeholder="Enter your Blood group" name="BloodType" required>
+            <input type="text" placeholder="Enter your Blood group" name="BloodType" id="BloodType" required>
           </div> 
           <div class="input-box">
             <span class="details">Kilograms</span>
-            <input type="text" placeholder="Enter your Kilograms" name="Kilograms" required>
+            <input type="text" placeholder="Enter your Kilograms" name="Kilograms" id="Kilograms" required>
           </div> 
           <div class="input-box">
             <span class="details">FeetInches</span>
-            <input type="text" placeholder="Enter your FeetInches" name="FeetInches" required>
+            <input type="text" placeholder="Enter your FeetInches" name="FeetInches" id="FeetInches" required>
           </div> 
           <div class="input-box">
             <span class="details">CrimeType</span>
-            <input type="text" placeholder="Enter  CrimeType" name="CrimeType" required>
+            <input type="text" placeholder="Enter  CrimeType" name="CrimeType" id="CrimeType" required>
           </div> 
 
         </div>
 
     
         <div class="button">
-          <input type="submit" value="Register">
+          <input type="submit" value="Register"  id="send_button" onclick="eventSubmit();">
         </div>
       </form>
     </div>
   </div>
-
+  
+<script>
+  // Add event listener for form submission
+  // document.querySelector('#addCriminal_form').addEventListener('submit', (event) => {
+  //   event.preventDefault(); // prevent default form submission behavior
+  //   eventSubmit(); // call the form validation function
+  // });
+  $("input").on("change", function() {
+    this.setAttribute(
+        "data-date",
+        moment(this.value, "YYYY-MM-DD")
+        .format( this.getAttribute("data-date-format") )
+    )
     
-
+}).trigger("change")
+</script>
 {% endblock %}
